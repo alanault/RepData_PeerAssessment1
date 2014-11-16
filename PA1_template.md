@@ -1,11 +1,6 @@
----
-title: "Reproducible Research Assignment 1"
-author: "Alan Ault"
-date: "16 November 2014"
-output:
-  html_document:
-    keep_md: yes
----
+# Reproducible Research Assignment 1
+Alan Ault  
+16 November 2014  
 
 
 ## Background  
@@ -23,10 +18,31 @@ This report steps through a variety of analysis. The R code which generates the 
 
 Prior to analysis, the data is loaded and prepared ready for analysis
 
-```{r}
+
+```r
 # First, load packages we need
 library (lubridate)             # makes working with dates easy
 library (dplyr)                 # for data anlaysis
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following objects are masked from 'package:lubridate':
+## 
+##     intersect, setdiff, union
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library (lattice)               # for trellis type plotting
 
 # set the working directory for the proejct and load data
@@ -46,7 +62,8 @@ For this section, we do two tasks, ignoring missing values in the dataset:
 1. Make a histogram of the total number of steps taken each day  
 2. Calculate and report the mean and median total number of steps taken per day  
 
-```{r} 
+
+```r
 # start by summarising by day
 stepsbyday <- group_by (data, date) %>%
                 summarise (totalsteps=sum (steps))
@@ -55,7 +72,11 @@ stepsbyday <- group_by (data, date) %>%
 hist (stepsbyday$totalsteps,
       xlab="Total steps per day",
       main="Total number of steps per day")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 # 2 Calculate the mean and median
 meansteps <- mean (stepsbyday$totalsteps, na.rm=TRUE)
 mediansteps <- median (stepsbyday$totalsteps, na.rm=TRUE)
@@ -64,8 +85,18 @@ mediansteps <- median (stepsbyday$totalsteps, na.rm=TRUE)
 # Round mean so easier to read, as given magnidude, digits aren't necesasry
 print (paste ("Mean number of steps taken per day:", 
               round(meansteps, digits=0)))
+```
 
+```
+## [1] "Mean number of steps taken per day: 10766"
+```
+
+```r
 print (paste ("Median number of steps taken per day:", mediansteps))
+```
+
+```
+## [1] "Median number of steps taken per day: 10765"
 ```
 
 
@@ -78,7 +109,8 @@ For this section, we perform the following:
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 
-```{r}
+
+```r
 # First, summarise by interval, with an average of the total steps
 stepsbyinterval <- group_by (data, interval) %>%
                     summarise (averagesteps = mean (steps, na.rm=TRUE))
@@ -91,12 +123,20 @@ plot (as.character(stepsbyinterval$interval), stepsbyinterval$averagesteps,
       type="l", lty=1, col="blue",
       xlab="Interval", ylab="Average steps by day",
       main="Average number of steps taken by interval by day")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+```r
 # 2. Which 5 min interval contains the most steps?
 # To do this, we find out the maximum average steps, then use this as an index to find the interval
 maxinterval <- stepsbyinterval$interval [which.max(stepsbyinterval$averagesteps)]
 # print the output
 print (paste ("The 5 minute interval with the maximum number of steps averaged across all days:", maxinterval))
+```
+
+```
+## [1] "The 5 minute interval with the maximum number of steps averaged across all days: 835"
 ```
 
 
@@ -112,17 +152,23 @@ This section of the report examines the impact of these missing values. Specific
 4. Make a histogram of the steps taken each day. Re-calculate the mean and median total number of steps taken per day. Examine whether these differ from those in section 1? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 
-```{r}
+
+```r
 # 1. Calculate the total missing values
 missingrows <- nrow (data) - sum (complete.cases (data))
 print (paste ("Rows with NA (ie. non-complete):", missingrows))
+```
+
+```
+## [1] "Rows with NA (ie. non-complete): 2304"
 ```
 
 **3. Strategy for imputing missing values**  
 Missing values from the dataset are replaced using the mean value from the previous analysis performed in section 3. If a value is missing for a specific day/interval, we look up the mean value for that interval and replace the NA value with this average.
 
 
-```{r}
+
+```r
 # 3.  Strategy for filling in missing values
 # We're going to use the mean of each interval to replace each NA
 # To do this, we loop through the dataset row by row, checking to see if there's a NA
@@ -154,8 +200,11 @@ imputedstepsbyday <- group_by (imputeddata, date) %>%
 hist (imputedstepsbyday$totalsteps,
       xlab="Total steps per day",
       main="Total number of steps per day")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
+```r
 # Calculate mean and median of the imputed data
 imputedmeansteps <- mean (imputedstepsbyday$totalsteps)
 imputedmediansteps <- median (imputedstepsbyday$totalsteps)
@@ -163,19 +212,69 @@ imputedmediansteps <- median (imputedstepsbyday$totalsteps)
 # Round mean so easier to read, given magnidude, digits aren't necesasry
 print (paste ("Imputed mean number of steps taken per day:", 
               round(imputedmeansteps, digits=0)))
+```
+
+```
+## [1] "Imputed mean number of steps taken per day: 10766"
+```
+
+```r
 print (paste ("Imputed median number of steps taken per day:", round(imputedmediansteps, digits=0)))
+```
 
+```
+## [1] "Imputed median number of steps taken per day: 10766"
+```
 
+```r
 # Comparison to previous values
 # Mean comparison
 print (paste ("Original mean:", round (meansteps, digits=0)))
-print (paste ("Imputed mean:", round (imputedmeansteps, digits=0)))
-print (paste ("Difference is:", round (meansteps - imputedmeansteps, digits=0)))
+```
 
+```
+## [1] "Original mean: 10766"
+```
+
+```r
+print (paste ("Imputed mean:", round (imputedmeansteps, digits=0)))
+```
+
+```
+## [1] "Imputed mean: 10766"
+```
+
+```r
+print (paste ("Difference is:", round (meansteps - imputedmeansteps, digits=0)))
+```
+
+```
+## [1] "Difference is: 0"
+```
+
+```r
 # median comparison
 print (paste ("Original median", round (mediansteps, digits=0)))
+```
+
+```
+## [1] "Original median 10765"
+```
+
+```r
 print (paste ("Imputed median:", round (imputedmediansteps, digits=0)))
+```
+
+```
+## [1] "Imputed median: 10766"
+```
+
+```r
 print (paste ("Difference is:", round (mediansteps - imputedmediansteps, digits=0)))
+```
+
+```
+## [1] "Difference is: -1"
 ```
 
 It is clear from the small difference that there is little difference in imputing the missing values for the data set. Both the mean and median values hardly change when based on the imputed values.
@@ -187,7 +286,8 @@ It is clear from the small difference that there is little difference in imputin
 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day  
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis)
 
-```{r}
+
+```r
 # 1. Create a new factor for weekday and weekend
 
 # Uses the date and ifelse matches sat or sun, then labels as appropriate
@@ -215,6 +315,8 @@ xyplot (averagesteps ~ interval | weekend,
         scales=list (alternating=1)
         )
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
 
 There are a number of notable differences between weekend and weekday:  
 1. Weekdays is dominated by around 9:00, possibly a commute to work/school    
